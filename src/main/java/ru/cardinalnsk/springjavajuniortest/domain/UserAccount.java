@@ -1,12 +1,15 @@
 package ru.cardinalnsk.springjavajuniortest.domain;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -33,6 +36,14 @@ public class UserAccount {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
+    String username;
+    String firstName;
+    String lastName;
+    String email;
+
+    @Enumerated(EnumType.STRING)
+    Gender gender;
+    LocalDate birthDate;
     String phoneNumber;
     String password;
     BigDecimal balance;
@@ -42,4 +53,5 @@ public class UserAccount {
 
     @OneToMany(fetch = FetchType.EAGER)
     Set<UserRole> role = new HashSet<>();
+
 }
