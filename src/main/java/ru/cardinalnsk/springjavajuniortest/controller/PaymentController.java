@@ -1,6 +1,8 @@
 package ru.cardinalnsk.springjavajuniortest.controller;
 
+import java.security.Principal;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,25 +16,26 @@ import ru.cardinalnsk.springjavajuniortest.service.PaymentService;
 @RestController
 @RequestMapping("/api/payment")
 @AllArgsConstructor
+@Slf4j
 public class PaymentController {
 
     private final PaymentService paymentService;
 
     @GetMapping("/current-balance")
-    public ResponseEntity<?> currentBalance() {
+    public ResponseEntity<?> currentBalance(Principal principal) {
         return ResponseEntity
-            .ok(paymentService.currentBalanceByAuthorityUser());
+            .ok(paymentService.currentBalanceByAuthorizedUser(principal));
     }
 
     @PostMapping("/pay-phone")
-    public ResponseEntity<?> payPhone(@RequestBody PayPhoneDto payPhoneDto) {
+    public ResponseEntity<?> payPhone(@RequestBody PayPhoneDto payPhoneDto, Principal principal) {
         return ResponseEntity
-            .ok(paymentService.payPhone(payPhoneDto));
+            .ok(paymentService.payPhone(payPhoneDto, principal));
     }
 
     @GetMapping("/history")
-    public ResponseEntity<?> getHistory(Pageable pageable) {
+    public ResponseEntity<?> getHistory(Pageable pageable, Principal principal) {
         return ResponseEntity
-            .ok(paymentService.getHistory(pageable));
+            .ok(paymentService.getHistory(pageable, principal));
     }
 }
