@@ -3,6 +3,9 @@ INSERT INTO user_entity(id, username, balance, password, phone_number)
 VALUES (1, 'Admin', 1000.00, '$2a$10$ceE4QQYDhI7v3mLuoWTOLOWxE3bVX7M9VsgSmDFK/XNh9LcTz7qvC',
         '+7912345678');
 
+INSERT INTO user_entity_role(user_entity_id, role_id)
+VALUES (1, 1);
+
 DO
 $$
     DECLARE
@@ -15,7 +18,7 @@ $$
 
         FOR i IN 1..50
             LOOP
-                -- Генерируем случайную сумму оплаты от 1 до 20, чтобы не уйти в минус
+                -- Генерируем случайную сумму оплаты от 1 до 50, чтобы не уйти в минус
                 payment_amount := ROUND((RANDOM() * 50)::NUMERIC, 2);
 
                 -- Проверяем, достаточно ли средств на балансе пользователя

@@ -10,8 +10,8 @@ CREATE TABLE IF NOT EXISTS user_entity
 (
     id           BIGSERIAL PRIMARY KEY,
     username     VARCHAR(50),
-    first_name     VARCHAR(50),
-    last_name     VARCHAR(50),
+    first_name   VARCHAR(50),
+    last_name    VARCHAR(50),
     email        VARCHAR(100),
     gender       VARCHAR(10),
     birth_date   DATE,
@@ -36,15 +36,22 @@ CREATE TABLE IF NOT EXISTS user_role
     authority VARCHAR(255)
 );
 
+
 CREATE TABLE IF NOT EXISTS user_entity_role
 (
-    user_entity_id BIGINT NOT NULL
-        CONSTRAINT fk_user_entity REFERENCES user_entity,
-    role_id        BIGINT NOT NULL
-        CONSTRAINT uk_user_role_id UNIQUE
-        CONSTRAINT fk_user_role REFERENCES user_role,
-    primary key (user_entity_id, role_id)
+    user_entity_id integer not null,
+    role_id        integer not null
 );
 
 
+ALTER TABLE user_entity_role
+    ADD CONSTRAINT user_accounts_roles__user_roles__fk
+        FOREIGN KEY (role_id) REFERENCES user_role (id);
 
+ALTER TABLE user_entity_role
+    ADD CONSTRAINT user_accounts_roles__user_accounts__fk
+        FOREIGN KEY (user_entity_id) REFERENCES user_entity (id);
+
+ALTER TABLE user_entity_role
+    ADD CONSTRAINT user_accounts_roles_unique
+        UNIQUE (user_entity_id, role_id);
