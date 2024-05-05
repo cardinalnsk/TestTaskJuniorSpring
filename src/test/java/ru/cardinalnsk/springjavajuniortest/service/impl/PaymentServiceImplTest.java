@@ -2,6 +2,8 @@ package ru.cardinalnsk.springjavajuniortest.service.impl;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
@@ -72,6 +74,8 @@ class PaymentServiceImplTest {
         PayResultDto expected = new PayResultDto(
             "Оплата на номер %s прошла успешно, ваш текущий баланс %.2f".formatted(
                 paymentReceiver.getPhoneNumber(), paymentSender.getBalance()));
+        verify(userRepository, times(1)).save(paymentSender);
+        verify(userRepository, times(1)).save(paymentReceiver);
 
         assertNotNull(actual);
         assertEquals(expected, actual);
@@ -103,6 +107,7 @@ class PaymentServiceImplTest {
         PayResultDto actual = paymentService.payPhone(payPhoneDto, principal);
         PayResultDto expected = new PayResultDto("Недостаточно средств");
 
+        verify(userRepository, times(0)).save(paymentSender);
         assertNotNull(actual);
         assertEquals(expected, actual);
         assertEquals(BigDecimal.valueOf(10), paymentSender.getBalance());

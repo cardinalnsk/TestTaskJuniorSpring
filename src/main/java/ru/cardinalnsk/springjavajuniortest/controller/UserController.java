@@ -3,7 +3,7 @@ package ru.cardinalnsk.springjavajuniortest.controller;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -24,7 +24,7 @@ public class UserController {
     }
 
 
-    @PostMapping
+    @PutMapping
     public ResponseEntity<UserDto> updateMyAccount(@RequestBody UserDto userDto) {
         return ResponseEntity
             .ok(userService.updateMyAccount(userDto));
