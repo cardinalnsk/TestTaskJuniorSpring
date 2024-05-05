@@ -32,22 +32,27 @@ public class UserServiceImpl implements UserService {
         UserRole userRole = userRoleService.findUserRole()
             .orElseThrow(() -> new RuntimeException("User role not found"));
 
-        UserAccount user = UserAccount.builder()
-            .balance(BigDecimal.valueOf(1000))
-            .username(registrationDto.firstName())
-            .phoneNumber(registrationDto.phoneNumber())
-            .password(passEncoder.encode(registrationDto.password()))
-            .role(Set.of(userRole))
-            .build();
+        UserAccount userAccount = findByPhoneNumber(registrationDto.phoneNumber())
+            .orElseGet(() ->
+                UserAccount.builder()
+                    .balance(BigDecimal.valueOf(1000))
+                    .username(registrationDto.firstName())
+                    .phoneNumber(registrationDto.phoneNumber())
+                    .password(passEncoder.encode(registrationDto.password()))
+                    .role(Set.of(userRole))
+                    .build()
+            );
 
-        UserAccount savedUser = userRepository.save(user);
+        if (userAccount.getId() != null) {
+            userAccount = userRepository.save(userAccount);
+        }
 
         String token = getAuthorizationToken(registrationDto);
 
         return RegistrationResponseDto.builder()
-            .userId(savedUser.getId())
-            .balance(savedUser.getBalance())
-            .phoneNumber(savedUser.getPhoneNumber())
+            .userId(userAccount.getId())
+            .balance(userAccount.getBalance())
+            .phoneNumber(userAccount.getPhoneNumber())
             .token(token)
             .build();
     }
