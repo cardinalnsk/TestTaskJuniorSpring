@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import ru.cardinalnsk.springjavajuniortest.aop.Loggable;
 import ru.cardinalnsk.springjavajuniortest.controller.payload.request.LoginDto;
 import ru.cardinalnsk.springjavajuniortest.controller.payload.request.RegistrationDto;
 import ru.cardinalnsk.springjavajuniortest.controller.payload.response.AccessTokenDto;
@@ -21,6 +22,7 @@ import ru.cardinalnsk.springjavajuniortest.service.UserService;
 @RequestMapping("api/auth")
 @AllArgsConstructor
 @Tag(name = "AUTH")
+@Loggable
 public class AuthorizationController {
 
     private final UserService userService;

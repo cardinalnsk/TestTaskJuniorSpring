@@ -7,12 +7,14 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import ru.cardinalnsk.springjavajuniortest.aop.Loggable;
 import ru.cardinalnsk.springjavajuniortest.controller.payload.response.UserDto;
 import ru.cardinalnsk.springjavajuniortest.service.UserService;
 
 @RestController
 @RequestMapping("/api/user")
 @AllArgsConstructor
+@Loggable
 public class UserController {
 
     private final UserService userService;

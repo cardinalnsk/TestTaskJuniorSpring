@@ -95,18 +95,18 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public AccessTokenDto login(LoginDto loginDto) {
-        if (findByPhoneNumber(loginDto.phoneNumber()).isEmpty()) {
+        if (findByPhoneNumber(loginDto.getPhoneNumber()).isEmpty()) {
             String message = "User with phone number: %s not found";
-            log.error(message.formatted(loginDto.phoneNumber()));
-            throw new UsernameNotFoundException(message.formatted(loginDto.phoneNumber()));
+            log.error(message.formatted(loginDto.getPhoneNumber()));
+            throw new UsernameNotFoundException(message.formatted(loginDto.getPhoneNumber()));
         }
 
         return new AccessTokenDto(getAuthorizationToken(loginDto));
     }
 
     private String getAuthorizationToken(LoginDto loginDto) {
-        byte[] loginPassword = "%s:%s".formatted(loginDto.phoneNumber(),
-            loginDto.password()).getBytes();
+        byte[] loginPassword = "%s:%s".formatted(loginDto.getPhoneNumber(),
+            loginDto.getPassword()).getBytes();
         return "Basic %s".formatted(Base64.getEncoder().encodeToString(loginPassword));
     }
 }
