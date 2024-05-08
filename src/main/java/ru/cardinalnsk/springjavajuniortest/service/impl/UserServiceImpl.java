@@ -1,6 +1,5 @@
 package ru.cardinalnsk.springjavajuniortest.service.impl;
 
-import java.math.BigDecimal;
 import java.util.Base64;
 import java.util.Optional;
 import java.util.Set;
@@ -12,8 +11,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ru.cardinalnsk.springjavajuniortest.controller.payload.request.RegistrationDto;
 import ru.cardinalnsk.springjavajuniortest.controller.payload.response.RegistrationResponseDto;
+import ru.cardinalnsk.springjavajuniortest.mapper.UserAccountToDtoMapper;
+import ru.cardinalnsk.springjavajuniortest.mapper.UserAccountMapperFromDtoAndEntity;
+import ru.cardinalnsk.springjavajuniortest.mapper.UserAccountToRegistrationDtoMapper;
 import ru.cardinalnsk.springjavajuniortest.controller.payload.response.UserDto;
-import ru.cardinalnsk.springjavajuniortest.domain.Gender;
 import ru.cardinalnsk.springjavajuniortest.domain.UserAccount;
 import ru.cardinalnsk.springjavajuniortest.domain.UserRole;
 import ru.cardinalnsk.springjavajuniortest.exception.UserAlreadyExistException;
@@ -29,6 +30,9 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final UserRoleService userRoleService;
     private final PasswordEncoder passEncoder;
+    private final UserAccountToDtoMapper userAccountMapper;
+    private final UserAccountToRegistrationDtoMapper userAccountToRegistrationDtoMapper;
+    private final UserAccountMapperFromDtoAndEntity userAccountMapperFromDtoAndEntity;
 
     @Override
     public RegistrationResponseDto registration(RegistrationDto registrationDto) {
@@ -45,7 +49,6 @@ public class UserServiceImpl implements UserService {
         }
 
         UserAccount userAccount = UserAccount.builder()
-            .balance(BigDecimal.valueOf(1000))
             .username(registrationDto.username())
             .phoneNumber(registrationDto.phoneNumber())
             .password(passEncoder.encode(registrationDto.password()))
@@ -55,13 +58,10 @@ public class UserServiceImpl implements UserService {
         userAccount = userRepository.save(userAccount);
 
         String token = getAuthorizationToken(registrationDto);
+        RegistrationResponseDto registrationResponseDtoDto = userAccountToRegistrationDtoMapper.toUserDto(userAccount);
+        registrationResponseDtoDto.setToken(token);
 
-        return RegistrationResponseDto.builder()
-            .userId(userAccount.getId())
-            .balance(userAccount.getBalance())
-            .phoneNumber(userAccount.getPhoneNumber())
-            .token(token)
-            .build();
+        return registrationResponseDtoDto;
     }
 
     private String getAuthorizationToken(RegistrationDto registrationDto) {
@@ -78,7 +78,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto getMyAccount() {
         return findUserAccountByAuthorize()
-            .map(this::mapUserAccountToUserDto)
+            .map(userAccountMapper::toUserDto)
             .orElseThrow(() -> new RuntimeException("User not found"));
     }
 
@@ -92,31 +92,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto updateMyAccount(UserDto userDto) {
         UserAccount userAccount = findUserAccountByAuthorize()
-            .map(usr -> updateUserAccount(userDto, usr))
+            .map(usr -> userAccountMapperFromDtoAndEntity.updateUserAccount(userDto,usr))
             .orElseThrow(() -> new RuntimeException("User not found"));
 
-        userRepository.save(userAccount);
-        return mapUserAccountToUserDto(userAccount);
-    }
-
-    private UserAccount updateUserAccount(UserDto userDto, UserAccount user) {
-        return user.toBuilder()
-            .email(userDto.email())
-            .gender(Gender.valueOf(userDto.gender()))
-            .firstName(userDto.firstName())
-            .lastName(userDto.lastName())
-            .birthDate(userDto.birthday())
-            .build();
-    }
-
-
-    private UserDto mapUserAccountToUserDto(UserAccount usr) {
-        return UserDto.builder()
-            .email(usr.getEmail())
-            .birthday(usr.getBirthDate())
-            .gender(usr.getGender() != null ? usr.getGender().name() : null)
-            .lastName(usr.getLastName())
-            .firstName(usr.getFirstName())
-            .build();
+        userAccount = userRepository.save(userAccount);
+        return userAccountMapper.toUserDto(userAccount);
     }
 }

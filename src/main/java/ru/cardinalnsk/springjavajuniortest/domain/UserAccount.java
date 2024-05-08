@@ -41,13 +41,16 @@ public class UserAccount extends BaseEntity {
     @Enumerated(EnumType.STRING)
     Gender gender;
     LocalDate birthDate;
-    BigDecimal balance;
+
+    @Builder.Default
+    BigDecimal balance = BigDecimal.valueOf(1000);
 
 
     @OneToMany(fetch = FetchType.LAZY)
     List<Payment> paymentHistory = new ArrayList<>();
 
     @OneToMany(fetch = FetchType.EAGER)
+    @Builder.Default
     Set<UserRole> role = new HashSet<>();
 
     @CreationTimestamp

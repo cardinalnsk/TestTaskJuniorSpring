@@ -9,7 +9,7 @@ public record UserDto(
     String lastName,
     String email,
     String gender,
-    LocalDate birthday
+    LocalDate birthDate
 ) {
 
 }
