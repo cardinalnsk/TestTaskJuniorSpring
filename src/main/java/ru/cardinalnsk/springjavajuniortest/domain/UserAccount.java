@@ -47,6 +47,7 @@ public class UserAccount extends BaseEntity {
 
 
     @OneToMany(fetch = FetchType.LAZY)
+    @Builder.Default
     List<Payment> paymentHistory = new ArrayList<>();
 
     @OneToMany(fetch = FetchType.EAGER)

@@ -19,6 +19,5 @@ public class RegistrationResponseDto {
     private Long userId;
     private String phoneNumber;
     private BigDecimal balance;
-    private String token;
 
 }

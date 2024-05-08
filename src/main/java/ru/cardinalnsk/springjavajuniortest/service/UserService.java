@@ -1,7 +1,9 @@
 package ru.cardinalnsk.springjavajuniortest.service;
 
 import java.util.Optional;
+import ru.cardinalnsk.springjavajuniortest.controller.payload.request.LoginDto;
 import ru.cardinalnsk.springjavajuniortest.controller.payload.request.RegistrationDto;
+import ru.cardinalnsk.springjavajuniortest.controller.payload.response.AccessTokenDto;
 import ru.cardinalnsk.springjavajuniortest.controller.payload.response.RegistrationResponseDto;
 import ru.cardinalnsk.springjavajuniortest.controller.payload.response.UserDto;
 import ru.cardinalnsk.springjavajuniortest.domain.UserAccount;
@@ -15,4 +17,6 @@ public interface UserService {
     UserDto getMyAccount();
 
     UserDto updateMyAccount(UserDto userDto);
+
+    AccessTokenDto login(LoginDto loginDto);
 }

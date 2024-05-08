@@ -6,10 +6,9 @@ import ru.cardinalnsk.springjavajuniortest.controller.payload.response.Registrat
 import ru.cardinalnsk.springjavajuniortest.domain.UserAccount;
 
 @Mapper(componentModel = "spring")
-public abstract class UserAccountToRegistrationDtoMapper {
+public interface UserAccountToRegistrationDtoMapper {
 
     @Mapping(target = "userId", source = "id")
-    @Mapping(target = "token", ignore = true)
-    public abstract RegistrationResponseDto toUserDto(UserAccount userAccount);
+    RegistrationResponseDto toUserDto(UserAccount userAccount);
 
 }
