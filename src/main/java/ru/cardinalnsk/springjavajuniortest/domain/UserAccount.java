@@ -1,14 +1,13 @@
 package ru.cardinalnsk.springjavajuniortest.domain;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -17,41 +16,41 @@ import java.util.Set;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
+import org.hibernate.annotations.CreationTimestamp;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
-@Builder
-@EqualsAndHashCode
+@Builder(toBuilder = true)
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Entity(name = "user_entity")
-public class UserAccount {
+public class UserAccount extends BaseEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long id;
     String username;
     String firstName;
     String lastName;
     String email;
-
+    @Column(unique = true, nullable = false)
+    String phoneNumber;
+    String password;
     @Enumerated(EnumType.STRING)
     Gender gender;
     LocalDate birthDate;
-    String phoneNumber;
-    String password;
     BigDecimal balance;
 
-    @OneToMany
+
+    @OneToMany(fetch = FetchType.LAZY)
     List<Payment> paymentHistory = new ArrayList<>();
 
     @OneToMany(fetch = FetchType.EAGER)
     Set<UserRole> role = new HashSet<>();
+
+    @CreationTimestamp
+    Instant createdAt;
 
 }

@@ -1,5 +1,6 @@
 package ru.cardinalnsk.springjavajuniortest.controller;
 
+import jakarta.validation.Valid;
 import java.security.Principal;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,7 +29,8 @@ public class PaymentController {
     }
 
     @PostMapping("/pay-phone")
-    public ResponseEntity<?> payPhone(@RequestBody PayPhoneDto payPhoneDto, Principal principal) {
+    public ResponseEntity<?> payPhone(@RequestBody @Valid PayPhoneDto payPhoneDto,
+        Principal principal) {
         return ResponseEntity
             .ok(paymentService.payPhone(payPhoneDto, principal));
     }

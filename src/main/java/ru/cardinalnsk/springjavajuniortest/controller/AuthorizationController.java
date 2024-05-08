@@ -1,5 +1,6 @@
 package ru.cardinalnsk.springjavajuniortest.controller;
 
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,12 +18,13 @@ public class AuthorizationController {
     private final UserService userService;
 
     @PostMapping("registration")
-    public ResponseEntity<?> registration(@RequestBody RegistrationDto registrationDto) {
+    public ResponseEntity<?> registration(
+        @RequestBody
+        @Valid
+        RegistrationDto registrationDto) {
         return ResponseEntity
             .ok(userService.registration(registrationDto));
     }
-
-
 
 
 }

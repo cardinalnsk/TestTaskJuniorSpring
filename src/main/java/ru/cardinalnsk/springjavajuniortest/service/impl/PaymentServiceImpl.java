@@ -4,14 +4,16 @@ import jakarta.transaction.Transactional;
 import java.math.BigDecimal;
 import java.security.Principal;
 import lombok.AllArgsConstructor;
-import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import ru.cardinalnsk.springjavajuniortest.controller.payload.request.PayPhoneDto;
 import ru.cardinalnsk.springjavajuniortest.controller.payload.response.PayResultDto;
 import ru.cardinalnsk.springjavajuniortest.controller.payload.response.PaymentDto;
 import ru.cardinalnsk.springjavajuniortest.domain.Payment;
 import ru.cardinalnsk.springjavajuniortest.domain.UserAccount;
+import ru.cardinalnsk.springjavajuniortest.repository.PaymentRepository;
 import ru.cardinalnsk.springjavajuniortest.repository.UserRepository;
 import ru.cardinalnsk.springjavajuniortest.service.PaymentService;
 
@@ -20,6 +22,7 @@ import ru.cardinalnsk.springjavajuniortest.service.PaymentService;
 public class PaymentServiceImpl implements PaymentService {
 
     private final UserRepository userRepository;
+    private final PaymentRepository paymentRepository;
 
     @Override
     public PaymentDto currentBalanceByAuthorizedUser(Principal principal) {
@@ -29,7 +32,7 @@ public class PaymentServiceImpl implements PaymentService {
 
     private UserAccount getAuthorizationUser(Principal principal) {
         return userRepository.findUserByPhoneNumber(principal.getName())
-            .orElseThrow(() -> new RuntimeException("User not found"));
+            .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 
     @Override
@@ -37,9 +40,10 @@ public class PaymentServiceImpl implements PaymentService {
     public PayResultDto payPhone(PayPhoneDto payPhoneDto, Principal principal) {
         String phoneNumber = payPhoneDto.phoneNumber();
         Double amount = payPhoneDto.amount();
+        Payment payment = createPayment(phoneNumber, amount);
 
         UserAccount paymentReceiver = userRepository.findUserByPhoneNumber(phoneNumber)
-            .orElseThrow(() -> new RuntimeException("User not found"));
+            .orElseThrow(() -> new UsernameNotFoundException("Receiver user not found"));
 
         UserAccount paymentSender = getAuthorizationUser(principal);
 
@@ -47,7 +51,11 @@ public class PaymentServiceImpl implements PaymentService {
             return new PayResultDto("Недостаточно средств");
         }
 
+        payment = paymentRepository.save(payment);
+
+        paymentSender.getPaymentHistory().add(payment);
         paymentSender.setBalance(new BigDecimal(paymentSender.getBalance().doubleValue() - amount));
+
         userRepository.save(paymentSender);
 
         paymentReceiver.setBalance(
@@ -59,11 +67,17 @@ public class PaymentServiceImpl implements PaymentService {
             message.formatted(phoneNumber, paymentSender.getBalance().doubleValue()));
     }
 
-    @Override
-    public PageImpl<Payment> getHistory(Pageable pageable, Principal principal) {
-        UserAccount user = getAuthorizationUser(principal);
-        return new PageImpl<>(user.getPaymentHistory());
+    private Payment createPayment(String phoneNumber, Double amount) {
+        return Payment.builder()
+            .phoneNumber(phoneNumber)
+            .amount(BigDecimal.valueOf(amount))
+            .build();
+    }
 
+    @Override
+    public Page<Payment> getHistory(Pageable pageable, Principal principal) {
+        UserAccount user = getAuthorizationUser(principal);
+        return paymentRepository.findPaymentHistoryByUserId(user.getId(), pageable);
     }
 
 }

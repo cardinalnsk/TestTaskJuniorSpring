@@ -5,6 +5,7 @@ import java.util.Base64;
 import java.util.Optional;
 import java.util.Set;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -15,12 +16,14 @@ import ru.cardinalnsk.springjavajuniortest.controller.payload.response.UserDto;
 import ru.cardinalnsk.springjavajuniortest.domain.Gender;
 import ru.cardinalnsk.springjavajuniortest.domain.UserAccount;
 import ru.cardinalnsk.springjavajuniortest.domain.UserRole;
+import ru.cardinalnsk.springjavajuniortest.exception.UserAlreadyExistException;
 import ru.cardinalnsk.springjavajuniortest.repository.UserRepository;
 import ru.cardinalnsk.springjavajuniortest.service.UserRoleService;
 import ru.cardinalnsk.springjavajuniortest.service.UserService;
 
 @Service
 @AllArgsConstructor
+@Slf4j
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
@@ -32,20 +35,24 @@ public class UserServiceImpl implements UserService {
         UserRole userRole = userRoleService.findUserRole()
             .orElseThrow(() -> new RuntimeException("User role not found"));
 
-        UserAccount userAccount = findByPhoneNumber(registrationDto.phoneNumber())
-            .orElseGet(() ->
-                UserAccount.builder()
-                    .balance(BigDecimal.valueOf(1000))
-                    .username(registrationDto.firstName())
-                    .phoneNumber(registrationDto.phoneNumber())
-                    .password(passEncoder.encode(registrationDto.password()))
-                    .role(Set.of(userRole))
-                    .build()
-            );
+        Optional<UserAccount> userAccountOptional = findByPhoneNumber(
+            registrationDto.phoneNumber());
 
-        if (userAccount.getId() != null) {
-            userAccount = userRepository.save(userAccount);
+        if (userAccountOptional.isPresent()) {
+            String message = "User with phone number: %s already exists";
+            log.error(message.formatted(registrationDto.phoneNumber()));
+            throw new UserAlreadyExistException(message.formatted(registrationDto.phoneNumber()));
         }
+
+        UserAccount userAccount = UserAccount.builder()
+            .balance(BigDecimal.valueOf(1000))
+            .username(registrationDto.username())
+            .phoneNumber(registrationDto.phoneNumber())
+            .password(passEncoder.encode(registrationDto.password()))
+            .role(Set.of(userRole))
+            .build();
+
+        userAccount = userRepository.save(userAccount);
 
         String token = getAuthorizationToken(registrationDto);
 
@@ -93,12 +100,13 @@ public class UserServiceImpl implements UserService {
     }
 
     private UserAccount updateUserAccount(UserDto userDto, UserAccount user) {
-        user.setEmail(userDto.email());
-        user.setGender(Gender.valueOf(userDto.gender()));
-        user.setFirstName(userDto.firstName());
-        user.setLastName(userDto.lastName());
-        user.setBirthDate(userDto.birthday());
-        return user;
+        return user.toBuilder()
+            .email(userDto.email())
+            .gender(Gender.valueOf(userDto.gender()))
+            .firstName(userDto.firstName())
+            .lastName(userDto.lastName())
+            .birthDate(userDto.birthday())
+            .build();
     }
 
 
