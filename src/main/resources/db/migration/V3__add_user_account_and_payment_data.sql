@@ -27,7 +27,7 @@ $$
                     user_balance := user_balance - payment_amount;
 
                     -- Вставляем запись об оплате
-                    INSERT INTO payment (balance, date, phone_number)
+                    INSERT INTO payment (amount, created_at, phone_number)
                     VALUES (payment_amount, NOW() + (i || ' minutes')::INTERVAL, '1234567890');
 
                     -- Связываем оплату с историей платежей пользователя

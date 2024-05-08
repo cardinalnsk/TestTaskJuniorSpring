@@ -1,8 +1,8 @@
 CREATE TABLE IF NOT EXISTS payment
 (
     id           BIGSERIAL PRIMARY KEY,
-    balance      NUMERIC(38, 2),
-    date         TIMESTAMP,
+    amount       NUMERIC(38, 2),
+    created_at   TIMESTAMP,
     phone_number VARCHAR(255)
 );
 
@@ -15,6 +15,7 @@ CREATE TABLE IF NOT EXISTS user_entity
     email        VARCHAR(100),
     gender       VARCHAR(10),
     birth_date   DATE,
+    created_at   TIMESTAMP,
     balance      NUMERIC(38, 2),
     password     VARCHAR(255),
     phone_number VARCHAR(255) NOT NULL UNIQUE
