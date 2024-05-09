@@ -105,9 +105,8 @@ public class UserServiceImpl implements UserService {
     }
 
     private String getAuthorizationToken(LoginDto loginDto) {
-        byte[] loginPassword = "%s:%s".formatted(loginDto.getPhoneNumber(),
-            loginDto.getPassword()).getBytes();
-        return "Basic %s".formatted(Base64.getEncoder().encodeToString(loginPassword));
+        String loginPassword = "%s:%s".formatted(loginDto.getPhoneNumber(), loginDto.getPassword());
+        return "Basic %s".formatted(Base64.getEncoder().encodeToString(loginPassword.getBytes()));
     }
 }
 
