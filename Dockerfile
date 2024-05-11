@@ -2,7 +2,7 @@ FROM maven:3.9.6-eclipse-temurin-21-jammy AS build
 WORKDIR /app
 COPY src src
 COPY pom.xml pom.xml
-RUN --mount=type=cache,target=/root/.m2 mvn clean package -Dmaven.test.skip=true
+RUN mvn clean package -Dmaven.test.skip=true
 
 
 FROM eclipse-temurin:21-jammy
