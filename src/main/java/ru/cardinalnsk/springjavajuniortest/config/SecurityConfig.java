@@ -25,6 +25,7 @@ public class SecurityConfig {
                 session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(authorizationManager -> {
                 authorizationManager.requestMatchers("/api/auth/**").permitAll();
+                authorizationManager.requestMatchers("/api/payment/**").permitAll();
                 authorizationManager.anyRequest().authenticated();
             })
             .httpBasic(Customizer.withDefaults());

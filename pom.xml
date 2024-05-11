@@ -108,6 +108,9 @@
       <version>2.5.0</version>
     </dependency>
 
+
+    <!--    DOCKER-->
+
   </dependencies>
 
   <build>
@@ -151,6 +154,7 @@
           </excludes>
         </configuration>
       </plugin>
+
     </plugins>
   </build>
 
